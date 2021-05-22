@@ -8,5 +8,10 @@
 import Foundation
 
 protocol SlowlyBasicTypeProtocol {
-    let basicType: SlowlyBasicTypeEnum {get}
+    static var basicType: SlowlyBasicTypeEnum { get }
+    static var name: String { get }
+    static var functionNames: [String] { get }
+    static var initParameters: [SlowlyFunctionInfo] { get }
+    
+    func 
 }

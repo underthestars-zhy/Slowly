@@ -7,7 +7,8 @@
 
 import Foundation
  
-enum SlowlyBasicTypeEnum:Int {
-    case unowned = 0
+enum SlowlyBasicTypeEnum {
+    case unowned
+    case none
     case int
 }

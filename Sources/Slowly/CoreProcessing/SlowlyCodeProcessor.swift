@@ -22,17 +22,29 @@ class SlowlyCodeProcessor {
         let code = _code.trimmingCharacters(in: .whitespacesAndNewlines)
         
         // Find the code belongs to
-        switch code {
-        case SlowlyRegex.defineVariables.rawValue.r: self.defineVariables(code)
-        default: throw SlowlyCompileError.cannotParseStatement(statement: code)
+        do {
+            switch code {
+            case SlowlyRegex.defineVariables.rawValue.r: try self.defineVariables(code)
+            default: throw SlowlyCompileError.cannotParseStatement(statement: code)
+            }
+        } catch {
+            throw error
         }
     }
     
     // MARK: - Define variables
-    func defineVariables(_ code: String) {
+    func defineVariables(_ code: String) throws {
         let valueInfo = SlowlyRegex.defineVariables.rawValue.r?.findFirst(in: code)
         let name = valueInfo?.group(at: 1)
         let value = valueInfo?.group(at: 2)
+        
+        guard let name = name else {
+            throw SlowlyCompileError.cannotParseStatement(statement: code)
+        }
+        
+        guard let value = value else {
+            throw SlowlyCompileError.cannotParseStatement(statement: code)
+        }
         
         self.creatVariable(name: name, value: value)
     }
