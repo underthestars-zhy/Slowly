@@ -17,5 +17,13 @@ struct SlowlyInterpreterInfo {
     static func initializeCompilationInfo() {
         shared.codePointer = 0
         shared.continueToCompile = true
+        shared.value = []
+        shared.module = []
     }
+    
+    // MARK: - Data that needs to be confirmed before compilation
+    var module = [SlwolyModuleConfigPackage]()
+    
+    // MARK: - It needs to be stored and recalled at any time during operation
+    var value = [SlowlyValue]()
 }

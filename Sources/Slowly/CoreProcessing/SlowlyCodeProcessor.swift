@@ -33,6 +33,8 @@ class SlowlyCodeProcessor {
         let valueInfo = SlowlyRegex.defineVariables.rawValue.r?.findFirst(in: code)
         let name = valueInfo?.group(at: 1)
         let value = valueInfo?.group(at: 2)
+        
+        self.creatVariable(name: name, value: value)
     }
     
     func creatVariable(name: String, value: String) {
