@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  SlowlyTranslater.swift
 //  
 //
 //  Created by 朱浩宇 on 2021/5/21.
