@@ -16,4 +16,5 @@ public struct SlwolyModuleConfigPackage {
     let type: SlwolyModuleConfigType
     let moduleClass: SlowlyModuleClassProtocol?
     let moduleFile: String?
+    let name: String
 }

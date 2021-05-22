@@ -19,7 +19,7 @@ struct SlowlyInterpreterInfo {
         shared.continueToCompile = true
         shared.value = []
         shared.module = [
-            .init(type: .slowly, moduleClass: SlowlyModule.shared, moduleFile: nil)
+            .init(type: .slowly, moduleClass: SlowlyModule.shared, moduleFile: nil, name: "Slowly")
         ]
     }
     

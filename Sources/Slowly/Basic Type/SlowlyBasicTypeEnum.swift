@@ -8,6 +8,7 @@
 import Foundation
  
 enum SlowlyBasicTypeEnum {
+    case any
     case unowned
     case none
     case int

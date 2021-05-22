@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SlowlyInt: SlowlyBasicTypeProtocol {
+struct SlowlyInt: SlowlyBasicTypeProtocol, Printable {
     // MARK: - External Interface
     static let basicType: SlowlyBasicTypeEnum = .int
     static let name: String = "Int"
@@ -26,12 +26,21 @@ struct SlowlyInt: SlowlyBasicTypeProtocol {
     }
     
     // MARK: - SlowlyInt
-    var value: Int
-    var isNil: Bool
+    var value: Int?
+    var isNilInt: Bool
     
-    //MARK: - Init
+    // MARK: - Init
     init(value: Int) {
-        self.isNil = false
+        self.isNilInt = false
         self.value = value
+    }
+    
+    // MARK: - Print
+    func printString() -> String {
+        if isNilInt {
+            return "Optional(\(value ?? 0)"
+        } else {
+            return String(value!)
+        }
     }
 }

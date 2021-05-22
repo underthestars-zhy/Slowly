@@ -10,5 +10,6 @@ import Foundation
 struct SlowlyFunctionParameter {
     var name: String?
     var identifier: String
+    var defaults: SlowlyBasicTypeProtocol?
     var type: SlowlyBasicTypeEnum
 }

@@ -10,4 +10,7 @@ import Foundation
 protocol SlowlyModuleClassProtocol {
     func allClass() -> [String]
     func allStruct() -> [String]
+    func allFunctions() -> [String]
+    func callFunction(_ name: String, values: [String : SlowlyBasicTypeProtocol]) -> SlowlyBasicTypeProtocol?
+    func getFunctionParameter(_ name: String) -> [SlowlyFunctionParameter]
 }

@@ -11,4 +11,6 @@ public enum SlowlyCompileError: Error {
     case noCompiledContent
     case cannotParseStatement(statement: String)
     case unableToCreateVariable(name: String, value: String)
+    case variablesAreDddedRepeatedly(name: String)
+    case unableToGetTheIntroduction(name: String)
 }
