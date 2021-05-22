@@ -9,5 +9,5 @@ import Foundation
 
 protocol SlowlyModuleClassProtocol {
     func allClass() -> [String]
-    func allStruct() -> [SlowlyBasicTypeProtocol]
+    func allStruct() -> [String]
 }

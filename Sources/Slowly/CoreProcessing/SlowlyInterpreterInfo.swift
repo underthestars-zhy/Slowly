@@ -18,7 +18,9 @@ struct SlowlyInterpreterInfo {
         shared.codePointer = 0
         shared.continueToCompile = true
         shared.value = []
-        shared.module = []
+        shared.module = [
+            .init(type: .slowly, moduleClass: SlowlyModule.shared, moduleFile: nil)
+        ]
     }
     
     // MARK: - Data that needs to be confirmed before compilation

@@ -10,6 +10,7 @@ import Regex
 
 enum SlowlyRegex: String {
     case defineVariables = #"^var ([A-z|_]\S*) = (\S+)$"#
+    case basicNumbers = #"(-)?\d"#
 }
 
 class SlowlyCodeProcessor {
@@ -46,10 +47,19 @@ class SlowlyCodeProcessor {
             throw SlowlyCompileError.cannotParseStatement(statement: code)
         }
         
-        self.creatVariable(name: name, value: value)
+        do {
+            try creatVariable(name: name, value: value)
+        } catch {
+            throw error
+        }
     }
     
-    func creatVariable(name: String, value: String) {
-        
+    func creatVariable(name: String, value: String) throws {
+        switch value {
+        case SlowlyRegex.basicNumbers.rawValue.r:
+            SlowlyInterpreterInfo.shared.value.append(.init(type: .variable, name: name, value: SlowlyInt(value: Int(value) ?? 0)))
+        default:
+            throw SlowlyCompileError.unableToCreateVariable(name: name, value: value)
+        }
     }
 }

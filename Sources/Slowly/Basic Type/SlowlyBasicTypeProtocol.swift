@@ -13,5 +13,5 @@ protocol SlowlyBasicTypeProtocol {
     static var functionNames: [String] { get }
     static var initParameters: [SlowlyFunctionInfo] { get }
     
-    func 
+    static func callFunctions(id: Int, values: [String: Any]) -> SlowlyBasicTypeProtocol?
 }

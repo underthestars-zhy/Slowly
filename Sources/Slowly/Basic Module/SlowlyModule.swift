@@ -7,10 +7,8 @@
 
 import Foundation
 
-class SlowlyModule: SlowlyModuleClassProtocol {
+struct SlowlyModule: SlowlyModuleClassProtocol {
     static let shared = SlowlyModule()
-    
-    allStruct = [""]
     
     init() {}
     
@@ -19,7 +17,7 @@ class SlowlyModule: SlowlyModuleClassProtocol {
         return []
     }
     
-    func allStruct() -> [SlowlyBasicTypeProtocol] {
-        return [SlowlyInt, SlowlyIntNil]
+    func allStruct() -> [String] {
+        return ["SlowlyInt"]
     }
 }

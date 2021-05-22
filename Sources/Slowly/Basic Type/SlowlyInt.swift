@@ -14,11 +14,24 @@ struct SlowlyInt: SlowlyBasicTypeProtocol {
     static var functionNames: [String] = []
     static var initParameters: [SlowlyFunctionInfo] = [
         SlowlyFunctionInfo(id: 1, parameter: [
-            SlowlyFunctionParameter(name: nil, identifier: "source", type: .int(nil: false))
+            SlowlyFunctionParameter(name: nil, identifier: "source", type: .int)
         ], returnValue: .none)
     ]
+    
+    static func callFunctions(id: Int, values: [String : Any]) -> SlowlyBasicTypeProtocol? {
+        switch id {
+        case 1: return SlowlyInt(value: values["source"] as! Int)
+        default: return nil
+        }
+    }
     
     // MARK: - SlowlyInt
     var value: Int
     var isNil: Bool
+    
+    //MARK: - Init
+    init(value: Int) {
+        self.isNil = false
+        self.value = value
+    }
 }
