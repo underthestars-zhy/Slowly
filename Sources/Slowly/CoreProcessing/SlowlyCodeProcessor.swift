@@ -9,8 +9,9 @@ import Foundation
 import Regex
 
 enum SlowlyRegex: String {
-    case defineVariables = #"^var ([A-z|_]\S*) = (\S+)$"#
+    case defineVariables = #"^var ([A-z|_].*) = (\S+)$"#
     case basicNumbers = #"(-)?\d"#
+    case basicFunction = #"([A-z|_].*)\(.*\)"#
 }
 
 class SlowlyCodeProcessor {
@@ -26,6 +27,7 @@ class SlowlyCodeProcessor {
         do {
             switch code {
             case SlowlyRegex.defineVariables.rawValue.r: try self.defineVariables(code)
+            case SlowlyRegex.basicFunction.rawValue.r: try self.callFunction(code)
             default: throw SlowlyCompileError.cannotParseStatement(statement: code)
             }
         } catch {
@@ -36,14 +38,12 @@ class SlowlyCodeProcessor {
     // MARK: - Define variables
     func defineVariables(_ code: String) throws {
         let valueInfo = SlowlyRegex.defineVariables.rawValue.r?.findFirst(in: code)
-        let name = valueInfo?.group(at: 1)
-        let value = valueInfo?.group(at: 2)
         
-        guard let name = name else {
+        guard let name = valueInfo?.group(at: 1) else {
             throw SlowlyCompileError.cannotParseStatement(statement: code)
         }
         
-        guard let value = value else {
+        guard let value = valueInfo?.group(at: 2) else {
             throw SlowlyCompileError.cannotParseStatement(statement: code)
         }
         
@@ -60,6 +60,19 @@ class SlowlyCodeProcessor {
             SlowlyInterpreterInfo.shared.value.append(.init(type: .variable, name: name, value: SlowlyInt(value: Int(value) ?? 0)))
         default:
             throw SlowlyCompileError.unableToCreateVariable(name: name, value: value)
+        }
+    }
+    
+    // MARK: - Call basic functions
+    func callFunction(_ code: String) throws {
+        let funcInfo = SlowlyRegex.basicFunction.rawValue.r?.findFirst(in: code)
+        
+        guard let funcName = funcInfo?.group(at: 1) {
+            throw SlowlyCompileError.cannotParseStatement(statement: code)
+        }
+        
+        guard let funcParameter = funcInfo?.group(at: 2) else {
+            throw SlowlyCompileError.cannotParseStatement(statement: code)
         }
     }
 }
