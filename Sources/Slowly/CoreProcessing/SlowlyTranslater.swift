@@ -11,4 +11,9 @@ class SlowlyTranslater {
     static let shared = SlowlyTranslater()
     
     init() {}
+    
+    func interpreter(with code: [String]) throws {
+        // Init
+        SlowlyInterpreterInfo.initializeCompilationInfo()
+    }
 }

@@ -8,5 +8,5 @@
 import Foundation
 
 public enum SlowlyCompileError: Error {
-    case NoCompiledContent
+    case noCompiledContent
 }

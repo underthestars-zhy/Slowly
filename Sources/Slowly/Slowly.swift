@@ -24,9 +24,16 @@ public struct Slowly {
         }
     }
     
-    func _build() throws {
+    private func _build() throws {
         guard self.compileCode.count > 0 else {
-            throw SlowlyCompileError.NoCompiledContent
+            throw SlowlyCompileError.noCompiledContent
+        }
+        
+        // Start compiling
+        do {
+            try SlowlyTranslater.shared.interpreter(with: self.compileCode)
+        } catch {
+            throw error
         }
     }
     
@@ -41,7 +48,7 @@ public struct Slowly {
         _setCompileCode(code)
     }
     
-    mutating func _setCompileCode(_ code: [String]) {
+    private mutating func _setCompileCode(_ code: [String]) {
         self.compileCode = code
     }
 }
