@@ -8,7 +8,8 @@
 import Foundation
 
 struct SlowlyFunctionParameter {
-    var name: String?
+    var name: String
+    var ignoreName: Bool
     var identifier: String
     var defaults: SlowlyBasicTypeProtocol?
     var type: SlowlyBasicTypeEnum

@@ -10,7 +10,7 @@
         }
         
         func testFunc() {
-            let code = ["test()", "print(101)"]
+            let code = ["test()", "print(items: 101)"]
             do {
                 try Slowly.shared.setCompileCode(code).build().end()
             } catch {

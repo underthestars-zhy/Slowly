@@ -28,7 +28,7 @@ struct SlowlyModule: SlowlyModuleClassProtocol {
     func callFunction(_ name: String, values: [String : SlowlyBasicTypeProtocol]) -> SlowlyBasicTypeProtocol? {
         switch name {
         case "print#1":
-            if let value = values["printValue"] as? Printable {
+            if let value = values["items"] as? Printable {
                 print(value.printString())
             } else {
                 
@@ -37,7 +37,6 @@ struct SlowlyModule: SlowlyModuleClassProtocol {
             return nil
         case "test":
             print("Hello")
-            
             return nil
         default:
             return nil
@@ -48,7 +47,7 @@ struct SlowlyModule: SlowlyModuleClassProtocol {
         switch name {
         case "print#1":
             let item = [
-                SlowlyFunctionParameter(name: "_", identifier: "printValue", defaults: nil, type: .any)
+                SlowlyFunctionParameter(name: "items", ignoreName: true, identifier: "items", defaults: nil, type: .any)
             ]
             return item
         default:

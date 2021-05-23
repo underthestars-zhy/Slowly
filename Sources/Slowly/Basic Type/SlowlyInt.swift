@@ -14,7 +14,7 @@ struct SlowlyInt: SlowlyBasicTypeProtocol, Printable {
     static var functionNames: [String] = []
     static var initParameters: [SlowlyFunctionInfo] = [
         SlowlyFunctionInfo(id: 1, parameter: [
-            SlowlyFunctionParameter(name: nil, identifier: "source", type: .int)
+            SlowlyFunctionParameter(name: "source", ignoreName: true, identifier: "source", type: .int)
         ], returnValue: .none)
     ]
     
@@ -24,6 +24,8 @@ struct SlowlyInt: SlowlyBasicTypeProtocol, Printable {
         default: return nil
         }
     }
+    
+    let basicType: SlowlyBasicTypeEnum = .int
     
     // MARK: - SlowlyInt
     var value: Int?

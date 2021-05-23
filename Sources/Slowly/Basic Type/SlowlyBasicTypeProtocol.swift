@@ -14,4 +14,6 @@ protocol SlowlyBasicTypeProtocol {
     static var initParameters: [SlowlyFunctionInfo] { get }
     
     static func callFunctions(id: Int, values: [String: Any]) -> SlowlyBasicTypeProtocol?
+    
+    var basicType: SlowlyBasicTypeEnum { get }
 }

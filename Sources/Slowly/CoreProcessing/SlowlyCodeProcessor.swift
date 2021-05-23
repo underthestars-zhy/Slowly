@@ -73,7 +73,7 @@ class SlowlyCodeProcessor {
         }
     }
     
-    // MARK: - Call basic functions
+    // MARK: - Call functions
     private func callFunction(_ code: String) throws {
         let funcInfo = SlowlyRegex.basicFunction.rawValue.r?.findFirst(in: code)
         
@@ -129,10 +129,21 @@ class SlowlyCodeProcessor {
                                     var _count = 0
                                     var _ok = false
                                     for p in parameters {
-                                        if p.name == "_" && !_valueSetArray[_count] {
-                                            _valueSetArray[_count] = true
-                                            do { values[p.identifier] = try getValue(_itemArray[0]) } catch { throw error }
-                                            _ok = true
+                                        if p.ignoreName && !_valueSetArray[_count] {
+                                            do {
+                                                if p.type == .any {
+                                                    _valueSetArray[_count] = true
+                                                    values[p.identifier] = try getValue(_itemArray[0])
+                                                    _ok = true
+                                                } else if try getValue(_itemArray[0]).basicType == p.type {
+                                                    _valueSetArray[_count] = true
+                                                    values[p.identifier] = try getValue(_itemArray[0])
+                                                    _ok = true
+                                                }
+                                            } catch {
+                                                throw error
+                                            }
+                                            
                                             break
                                         }
                                         
@@ -145,7 +156,37 @@ class SlowlyCodeProcessor {
                                 } else if _itemArray.count < 1 {
                                     throw SlowlyCompileError.cannotParseStatement(statement: code)
                                 } else {
+                                    var _ok = false
+                                    var _count = 0
+                                    for p in parameters {
+                                        if p.name == _itemArray[0] {
+                                            if _valueSetArray[_count] {
+                                                throw SlowlyCompileError.duplicateNameParameter(parameter: _itemArray[0])
+                                            } else {
+                                                
+                                                do {
+                                                    if p.type == .any {
+                                                        _valueSetArray[_count] = true
+                                                        values[p.identifier] = try getValue(_itemArray[1])
+                                                        _ok = true
+                                                    } else if try getValue(_itemArray[0]).basicType == p.type {
+                                                        _valueSetArray[_count] = true
+                                                        values[p.identifier] = try getValue(_itemArray[1])
+                                                        _ok = true
+                                                    }
+                                                } catch {
+                                                    throw error
+                                                }
+                                                
+                                                break
+                                            }
+                                        }
+                                        _count += 1
+                                    }
                                     
+                                    if !_ok {
+                                        throw SlowlyCompileError.cannotParseStatement(statement: code)
+                                    }
                                 }
                             }
                             
