@@ -65,11 +65,11 @@ class SlowlyCodeProcessor {
             throw SlowlyCompileError.variablesAreDddedRepeatedly(name: name)
         }
         
-        switch value {
-        case SlowlyRegex.basicNumbers.rawValue.r:
-            SlowlyInterpreterInfo.shared.value.append(.init(type: .variable, name: name, value: SlowlyInt(value: Int(value) ?? 0)))
-        default:
-            throw SlowlyCompileError.unableToCreateVariable(name: name, value: value)
+        
+        do {
+            SlowlyInterpreterInfo.shared.value.append(.init(type: .variable, name: name, value: try getValue(value)))
+        } catch {
+            throw error
         }
     }
     
