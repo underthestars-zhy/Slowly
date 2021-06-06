@@ -18,7 +18,7 @@ class SlowlyTranslater {
         
         do {
             while SlowlyInterpreterInfo.shared.continueToCompile && SlowlyInterpreterInfo.shared.codePointer < code.count {
-                print(code[SlowlyInterpreterInfo.shared.codePointer])
+                // print(code[SlowlyInterpreterInfo.shared.codePointer])
                 try SlowlyCodeProcessor.shared.process(with: code[SlowlyInterpreterInfo.shared.codePointer])
             }
         } catch {

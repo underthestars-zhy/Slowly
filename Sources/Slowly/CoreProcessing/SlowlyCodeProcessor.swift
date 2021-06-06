@@ -11,6 +11,7 @@ import Regex
 enum SlowlyRegex: String {
     case defineVariables = #"^var ([A-z|_]\S*) = (\S+)$"#
     case basicNumbers = #"(-)?\d"#
+    case eNumbers = #""#
     case basicFunction = #"([A-z|_]\S*)\((.*)\)"#
 }
 
@@ -188,6 +189,21 @@ class SlowlyCodeProcessor {
                                         throw SlowlyCompileError.cannotParseStatement(statement: code)
                                     }
                                 }
+                                
+                            }
+                            
+                            var _count = 0
+                            
+                            for judgmentItem in _valueSetArray {
+                                if !judgmentItem {
+                                    if parameters[_count].defaults != nil {
+                                        
+                                    } else {
+                                        throw SlowlyCompileError.cannotParseStatement(statement: code)
+                                    }
+                                }
+                                
+                                _count += 1
                             }
                             
                             let _ = moduleClass.callFunction(_funcName, values: values)

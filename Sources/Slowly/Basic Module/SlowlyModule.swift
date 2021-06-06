@@ -22,7 +22,7 @@ struct SlowlyModule: SlowlyModuleClassProtocol {
     }
     
     func allFunctions() -> [String] {
-        return ["print#1", "test"]
+        return ["print#1"]
     }
     
     func callFunction(_ name: String, values: [String : SlowlyBasicTypeProtocol]) -> SlowlyBasicTypeProtocol? {
@@ -34,9 +34,6 @@ struct SlowlyModule: SlowlyModuleClassProtocol {
                 
             }
             
-            return nil
-        case "test":
-            print("Hello")
             return nil
         default:
             return nil

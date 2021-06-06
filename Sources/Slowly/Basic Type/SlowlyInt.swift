@@ -40,7 +40,11 @@ struct SlowlyInt: SlowlyBasicTypeProtocol, Printable {
     // MARK: - Print
     func printString() -> String {
         if isNilInt {
-            return "Optional(\(value ?? 0)"
+            if let value = self.value {
+                print("Optional(\(value)")
+            } else {
+                print("Optional(nil)")
+            }
         } else {
             return String(value!)
         }
