@@ -28,7 +28,7 @@ class SlowlyCodeProcessor {
         do {
             switch code {
             case SlowlyRegex.defineVariables.rawValue.r: try self.defineVariables(code)
-            case SlowlyRegex.basicFunction.rawValue.r: try self.callFunction(code)
+            case SlowlyRegex.basicFunction.rawValue.r: let _ = try self.callFunction(code)
             default:
                 SlowlyInterpreterInfo.shared.continueToCompile = false
                 throw SlowlyCompileError.cannotParseStatement(statement: code)
@@ -63,7 +63,7 @@ class SlowlyCodeProcessor {
     
     private func creatVariable(name: String, value: String) throws {
         guard !variableHasBeenAdded(name: name) else {
-            throw SlowlyCompileError.variablesAreDddedRepeatedly(name: name)
+            throw SlowlyValueError.theVariableAlreadyExistsInTheCurrentContext(name: name)
         }
         
         
@@ -75,7 +75,7 @@ class SlowlyCodeProcessor {
     }
     
     // MARK: - Call functions
-    private func callFunction(_ code: String) throws {
+    private func callFunction(_ code: String) throws -> SlowlyBasicTypeProtocol? {
         let funcInfo = SlowlyRegex.basicFunction.rawValue.r?.findFirst(in: code)
         
         guard let funcName = funcInfo?.group(at: 1) else {
@@ -86,140 +86,49 @@ class SlowlyCodeProcessor {
             throw SlowlyCompileError.cannotParseStatement(statement: code)
         }
         
-        var successfulRequestFunction = false
-        
-        // Query function
         for module in SlowlyInterpreterInfo.shared.module {
             if module.type == .slowly {
-                guard let moduleClass = module.moduleClass else {
-                    throw SlowlyCompileError.unableToGetTheIntroduction(name: module.name)
-                }
+                // 模型是基于Swift实现的
                 
-                for _funcName in moduleClass.allFunctions() {
-                    if funcName == _funcName.split(separator: "#")[0] {
-                        let parametersStringArray = funcParameter.split(with: ",")
-                        
-                        if parametersStringArray.count == 0 {
-                            var allHaveDefaultValues = true
-                            for _item in moduleClass.getFunctionParameter(_funcName) {
-                                allHaveDefaultValues = allHaveDefaultValues || _item.defaults != nil
+                if let processClass = module.moduleClass {
+                    // 获得核心处理器: processClass
+                    
+                    // 遍历所有模型中的函数
+                    for function in processClass.allFunctions() {
+                        if function.split(with: "#")[0] == funcName {
+                            // 函数名称符合
+                            let parameters = processClass.getFunctionParameter(function)
+                            if funcParameter == "" {
+                                if parameters.isEmpty {
+                                    // 无需参数
+                                    return processClass.callFunction(function, values: [:])
+                                }
                             }
                             
-                            if allHaveDefaultValues {
-                                successfulRequestFunction = true
-                                var values = [String : SlowlyBasicTypeProtocol]()
-                                for p in moduleClass.getFunctionParameter(_funcName) {
-                                    guard let defaults = p.defaults else {
-                                        throw SlowlyCompileError.cannotParseStatement(statement: code)
-                                    }
-                                    values[p.identifier] = defaults
-                                }
-                                let _ = moduleClass.callFunction(_funcName, values: values)
-                            } else {
-                                continue
-                            }
-                        } else {
-                            successfulRequestFunction = true
-                            var values = [String : SlowlyBasicTypeProtocol]()
-                            let parameters = moduleClass.getFunctionParameter(_funcName)
-                            var _valueSetArray = Array(repeating: false, count: parameters.count)
+                            let allParameters = funcParameter.split(with: ",") // 分割参数
                             
-                            for item in parametersStringArray {
-                                let _itemArray = item.split(with: ":")
-                                if _itemArray.count == 1 {
-                                    var _count = 0
-                                    var _ok = false
-                                    for p in parameters {
-                                        if p.ignoreName && !_valueSetArray[_count] {
-                                            do {
-                                                if p.type == .any {
-                                                    _valueSetArray[_count] = true
-                                                    values[p.identifier] = try getValue(_itemArray[0])
-                                                    _ok = true
-                                                } else if try getValue(_itemArray[0]).basicType == p.type {
-                                                    _valueSetArray[_count] = true
-                                                    values[p.identifier] = try getValue(_itemArray[0])
-                                                    _ok = true
-                                                }
-                                            } catch {
-                                                throw error
-                                            }
-                                            
-                                            break
-                                        }
-                                        
-                                        _count += 1
-                                    }
-                                    
-                                    if !_ok {
-                                        throw SlowlyCompileError.cannotParseStatement(statement: code)
-                                    }
-                                } else if _itemArray.count < 1 {
-                                    throw SlowlyCompileError.cannotParseStatement(statement: code)
-                                } else {
-                                    var _ok = false
-                                    var _count = 0
-                                    for p in parameters {
-                                        if p.name == _itemArray[0] {
-                                            if _valueSetArray[_count] {
-                                                throw SlowlyCompileError.duplicateNameParameter(parameter: _itemArray[0])
-                                            } else {
-                                                
-                                                do {
-                                                    if p.type == .any {
-                                                        _valueSetArray[_count] = true
-                                                        values[p.identifier] = try getValue(_itemArray[1])
-                                                        _ok = true
-                                                    } else if try getValue(_itemArray[0]).basicType == p.type {
-                                                        _valueSetArray[_count] = true
-                                                        values[p.identifier] = try getValue(_itemArray[1])
-                                                        _ok = true
-                                                    }
-                                                } catch {
-                                                    throw error
-                                                }
-                                                
-                                                break
-                                            }
-                                        }
-                                        _count += 1
-                                    }
-                                    
-                                    if !_ok {
-                                        throw SlowlyCompileError.cannotParseStatement(statement: code)
-                                    }
-                                }
+                            // 遍历输入的参数
+                            for p in allParameters {
                                 
                             }
-                            
-                            var _count = 0
-                            
-                            for judgmentItem in _valueSetArray {
-                                if !judgmentItem {
-                                    if parameters[_count].defaults != nil {
-                                        
-                                    } else {
-                                        throw SlowlyCompileError.cannotParseStatement(statement: code)
-                                    }
-                                }
-                                
-                                _count += 1
-                            }
-                            
-                            let _ = moduleClass.callFunction(_funcName, values: values)
                         }
-                        
-                        break
                     }
+                } else {
+                    // 无法获得核心处理器
+                    throw SlowlyModelError.unableToGetDodelProcessor(name: module.name)
                 }
-            } else {
                 
+            } else if module.type == .file {
+                // 模型是基于Slowly代码实现的
+                
+            } else {
+                // 错误处理，好吧一般没问题
+                throw SlowlyModelError.unableToGetModelAnalysisMethod(name: module.name)
             }
         }
         
-        if !successfulRequestFunction {
-            throw SlowlyCompileError.cannotParseStatement(statement: code)
-        }
+        // 对没有寻找到函数做处理
+        throw SlowlyFunctionError.cannotFindFunction(funcName: funcName)
     }
     
     // MARK: - Share
