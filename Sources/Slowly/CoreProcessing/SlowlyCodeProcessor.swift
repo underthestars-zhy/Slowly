@@ -107,9 +107,54 @@ class SlowlyCodeProcessor {
                             
                             let allParameters = funcParameter.split(with: ",") // 分割参数
                             
+                            var verification = [Bool](repeating: false, count: parameters.count) // 用于验证是否已经设置数据
+                            
+                            var values = [String : SlowlyBasicTypeProtocol]() // 函数的传入数
+                            
                             // 遍历输入的参数
                             for p in allParameters {
-                                
+                                let inputParameter = p.split(with: ":") // 获得输入
+                                if inputParameter.count == 1 {
+                                    var _find = false
+                                    
+                                    for (index, parameter) in parameters.enumerated() {
+                                        if parameter.ignoreName && !verification[index] {
+                                            // 允许使用_
+                                            verification[index] = true
+                                            _find = true
+                                            do {
+                                                values[parameter.identifier] = try getValue(p) // 设置值
+                                            } catch {
+                                                throw error
+                                            }
+                                        }
+                                    }
+                                    
+                                    if !_find { // 错误处理
+                                        break
+                                    }
+                                } else if inputParameter.count == 2 {
+                                    // 标准输入
+                                    
+                                } else {
+                                    throw SlowlyFunctionError.unrecognizedIncomingParameters(parameters: p)
+                                }
+                            }
+                            
+                            for (index, value) in verification.enumerated() {
+                                if !value {
+                                    // 用户没有输入
+                                    if let v = parameters[index].defaults {
+                                        values[parameters[index].identifier] = v
+                                    } else {
+                                        break // 错误处理
+                                    }
+                                }
+                            }
+                            
+                            if verification.filter({ !$0 }).count == 0 {
+                                // 所有参数已经填入
+                                return processClass.callFunction(function, values: values)
                             }
                         }
                     }

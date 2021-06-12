@@ -9,4 +9,6 @@ import Foundation
 
 public enum SlowlyFunctionError: Error {
     case cannotFindFunction(funcName: String)
+    case unrecognizedIncomingParameters(parameters: String)
+    case unableToFindMatchingConfigurationParameters(parameters: String)
 }
