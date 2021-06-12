@@ -10,8 +10,8 @@ import Regex
 
 enum SlowlyRegex: String {
     case defineVariables = #"^var ([A-z|_]\S*) = (\S+)$"#
-    case basicNumbers = #"(-)?\d"#
-    case eNumbers = #""#
+    case basicNumbers = #"-?\d"#
+    case eNumbers = #"-?(\d+\.?\d*)e()"#
     case basicFunction = #"([A-z|_]\S*)\((.*)\)"#
 }
 
@@ -118,15 +118,16 @@ class SlowlyCodeProcessor {
                                     var _find = false
                                     
                                     for (index, parameter) in parameters.enumerated() {
-                                        if parameter.ignoreName && !verification[index] {
-                                            // 允许使用_
-                                            verification[index] = true
-                                            _find = true
-                                            do {
-                                                values[parameter.identifier] = try getValue(p) // 设置值
-                                            } catch {
-                                                throw error
+                                        do {
+                                            let _v = try getValue(p)
+                                            if parameter.ignoreName && !verification[index] && (parameter.type == .any || parameter.type == _v.basicType) {
+                                                // 允许使用_
+                                                verification[index] = true
+                                                _find = true
+                                                values[parameter.identifier] = _v // 设置值
                                             }
+                                        } catch {
+                                            throw error
                                         }
                                     }
                                     
@@ -139,15 +140,16 @@ class SlowlyCodeProcessor {
                                     var _find = false
                                     
                                     for (index, parameter) in parameters.enumerated() {
-                                        if parameter.name == inputParameter[0] && !verification[index] {
-                                            // 匹配
-                                            verification[index] = true
-                                            _find = true
-                                            do {
-                                                values[parameter.identifier] = try getValue(inputParameter[1]) // 设置值
-                                            } catch {
-                                                throw error
+                                        do {
+                                            let _v = try getValue(inputParameter[1])
+                                            if parameter.name == inputParameter[0] && !verification[index] && (parameter.type == .any || parameter.type == _v.basicType) {
+                                                // 匹配
+                                                verification[index] = true
+                                                _find = true
+                                                values[parameter.identifier] = _v // 设置值
                                             }
+                                        } catch {
+                                            throw error
                                         }
                                     }
                                     
