@@ -20,4 +20,13 @@
                 print(error)
             }
         }
+        
+        func testFunc2() {
+            let code = [["@main", "var items = 11222", "print(items)", "print(items: items)", "var aa = 1.22e4", "print(aa)"]]
+            do {
+                try Slowly.shared.setCompileCode(code).build().end()
+            } catch {
+                print(error)
+            }
+        }
     }

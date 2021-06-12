@@ -94,6 +94,16 @@ class SlowlyCodeProcessor {
         }
     }
     
+    // MARK: - Usage value
+    private func getValueValue(name: String) ->SlowlyBasicTypeProtocol? {
+        for value in SlowlyInterpreterInfo.shared.value {
+            if name == value.name {
+                return value.value
+            }
+        }
+        return nil
+    }
+    
     // MARK: - Call functions
     private func callFunction(_ code: String) throws -> SlowlyBasicTypeProtocol? {
         let funcInfo = SlowlyRegex.basicFunction.rawValue.r?.findFirst(in: code)
@@ -258,6 +268,9 @@ class SlowlyCodeProcessor {
                 return SlowlyDouble(value: value)
             }
         default:
+            if let value = getValueValue(name: code) {
+                return value
+            }
             throw SlowlyCompileError.cannotParseStatement(statement: code)
         }
     }
