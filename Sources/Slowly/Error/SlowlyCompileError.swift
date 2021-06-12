@@ -10,4 +10,5 @@ import Foundation
 public enum SlowlyCompileError: Error {
     case noCompiledContent
     case cannotParseStatement(statement: String)
+    case repeatedStartIdentifier
 }

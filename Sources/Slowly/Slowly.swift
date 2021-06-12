@@ -3,7 +3,7 @@ import Foundation
 public struct Slowly {
     static var shared = Slowly()
     
-    private var compileCode = [String]()
+    private var compileCode = [[String]]()
     
     // MARK: - Start to compile the compiled content
     func build() throws -> Slowly {
@@ -22,7 +22,7 @@ public struct Slowly {
     }
     
     // MARK: - Set the string information to be compiled
-    mutating func setCompileCode(_ code: [String]) -> Slowly {
+    mutating func setCompileCode(_ code: [[String]]) -> Slowly {
         self.compileCode = code
         
         return self

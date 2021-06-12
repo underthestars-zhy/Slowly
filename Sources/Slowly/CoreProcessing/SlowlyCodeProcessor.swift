@@ -21,9 +21,24 @@ class SlowlyCodeProcessor {
     
     init() {}
     
+    private var findMain = false
+    
     func process(with _code: String) throws {
         // Remove spaces and newlines
         let code = _code.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // 检测开始开始
+        if findMain {
+            if code == "@main" {
+                throw SlowlyCompileError.repeatedStartIdentifier
+            }
+        } else {
+            if code == "@main" {
+                self.findMain = true
+            }
+            SlowlyInterpreterInfo.shared.codePointer += 1
+            return
+        }
         
         // Find the code belongs to
         do {
@@ -41,6 +56,10 @@ class SlowlyCodeProcessor {
         
         // Prepare for the next interpretation statement
         SlowlyInterpreterInfo.shared.codePointer += 1
+    }
+    
+    func clear() {
+        self.findMain = false
     }
     
     // MARK: - Define variables
