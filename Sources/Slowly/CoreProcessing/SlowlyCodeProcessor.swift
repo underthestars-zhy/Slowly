@@ -10,9 +10,10 @@ import Regex
 
 enum SlowlyRegex: String {
     case defineVariables = #"^var ([A-z|_]\S*) = (\S+)$"#
-    case basicNumbers = #"-?\d"#
-    case eNumbers = #"-?(\d+\.?\d*)e()"#
-    case basicFunction = #"([A-z|_]\S*)\((.*)\)"#
+    case basicNumbers = #"^-?\d+$"#
+    case basicDouble = #"^-?\d+\.\d+$"#
+    case eNumbers = #"^-?(\d+\.?\d*)e(\d+)$"#
+    case basicFunction = #"^([A-z|_]\S*)\((.*)\)$"#
 }
 
 class SlowlyCodeProcessor {
@@ -211,6 +212,32 @@ class SlowlyCodeProcessor {
         switch code {
         case SlowlyRegex.basicNumbers.rawValue.r:
             return SlowlyInt(value: Int(code) ?? 0)
+        case SlowlyRegex.basicDouble.rawValue.r:
+            return SlowlyDouble(value: Double(code) ?? 0.0)
+        case SlowlyRegex.eNumbers.rawValue.r:
+            let eNumberInfo = SlowlyRegex.eNumbers.rawValue.r?.findFirst(in: code)
+            
+            guard let num = eNumberInfo?.group(at: 1) else {
+                throw SlowlyCompileError.cannotParseStatement(statement: code)
+            }
+            
+            guard let numIndex = eNumberInfo?.group(at: 2) else {
+                throw SlowlyCompileError.cannotParseStatement(statement: code)
+            }
+            
+            var value = Double(num) ?? 0
+            
+            for _ in 0..<(Int(numIndex) ?? 0) {
+                value *= 10
+            }
+            
+            if code.hasPrefix("-") {
+                // 负数
+                return SlowlyDouble(value: -value)
+            } else {
+                // 正数
+                return SlowlyDouble(value: value)
+            }
         default:
             throw SlowlyCompileError.cannotParseStatement(statement: code)
         }

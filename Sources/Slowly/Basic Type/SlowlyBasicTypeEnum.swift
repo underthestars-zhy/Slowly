@@ -12,4 +12,5 @@ enum SlowlyBasicTypeEnum {
     case unowned
     case none
     case int
+    case double
 }
