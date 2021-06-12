@@ -136,6 +136,24 @@ class SlowlyCodeProcessor {
                                 } else if inputParameter.count == 2 {
                                     // 标准输入
                                     
+                                    var _find = false
+                                    
+                                    for (index, parameter) in parameters.enumerated() {
+                                        if parameter.name == inputParameter[0] && !verification[index] {
+                                            // 匹配
+                                            verification[index] = true
+                                            _find = true
+                                            do {
+                                                values[parameter.identifier] = try getValue(inputParameter[1]) // 设置值
+                                            } catch {
+                                                throw error
+                                            }
+                                        }
+                                    }
+                                    
+                                    if !_find { // 错误处理
+                                        break
+                                    }
                                 } else {
                                     throw SlowlyFunctionError.unrecognizedIncomingParameters(parameters: p)
                                 }
