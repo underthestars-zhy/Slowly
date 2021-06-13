@@ -32,7 +32,7 @@ struct SlowlyString: SlowlyBasicTypeProtocol, Printable {
     var isNilInt: Bool
     
     // MARK: - Init
-    init(value: Int) {
+    init(value: String) {
         self.isNilInt = false
         self.value = value
     }

@@ -12,4 +12,5 @@ public enum SlowlyValueError: Error {
     case theVariableAlreadyExistsInTheCurrentContext(name: String)
     case unableToFindTheValue(name: String)
     case typeDoesNotMatchWhenAssigning(name: String)
+    case couldNotParseString(string: String)
 }

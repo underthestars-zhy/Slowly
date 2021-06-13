@@ -41,7 +41,7 @@ struct SlowlyDouble: SlowlyBasicTypeProtocol, Printable {
     func printString() -> String {
         if isNilInt {
             if let value = self.value {
-                return "Optional(\(value)"
+                return "Optional(\(value))"
             } else {
                 return "Optional(nil)"
             }

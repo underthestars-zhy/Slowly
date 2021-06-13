@@ -9,12 +9,12 @@ import Foundation
 import Regex
 
 enum SlowlyRegex: String {
-    case defineVariables = #"^var ([A-z|_]\S*) = (\S+)$"#
-    case defineConstant = #"^let ([A-z|_]\S*) = (\S+)$"#
-    case fastMeasurement = #"^([A-z|_]\S*) := (\S+)$"#
-    case assignment = #"^([A-z|_]\S*) = (\S+)$"#
+    case defineVariables = #"^var ([A-z|_]\S*) = (.+)$"#
+    case defineConstant = #"^let ([A-z|_]\S*) = (.+)$"#
+    case fastMeasurement = #"^([A-z|_]\S*) := (.+)$"#
+    case assignment = #"^([A-z|_]\S*) = (.+)$"#
     case basicNumbers = #"^-?\d+$"#
-    case basicString = #""([\s\S]*)""#
+    case basicString = #"^"(.*)"$"#
     case basicDouble = #"^-?\d+\.\d+$"#
     case eNumbers = #"^-?(\d+\.?\d*)e(\d+)$"#
     case basicFunction = #"^([A-z|_]\S*)\((.*)\)$"#
@@ -343,6 +343,36 @@ class SlowlyCodeProcessor {
         return false
     }
     
+    private func verificationString(_ str: String) -> Bool {
+        
+    }
+    
+    private func creatENumber(_ code: String) throws -> SlowlyDouble {
+        let eNumberInfo = SlowlyRegex.eNumbers.rawValue.r?.findFirst(in: code)
+        
+        guard let num = eNumberInfo?.group(at: 1) else {
+            throw SlowlyCompileError.cannotParseStatement(statement: code)
+        }
+        
+        guard let numIndex = eNumberInfo?.group(at: 2) else {
+            throw SlowlyCompileError.cannotParseStatement(statement: code)
+        }
+        
+        var value = Double(num) ?? 0
+        
+        for _ in 0..<(Int(numIndex) ?? 0) {
+            value *= 10
+        }
+        
+        if code.hasPrefix("-") {
+            // 负数
+            return SlowlyDouble(value: -value)
+        } else {
+            // 正数
+            return SlowlyDouble(value: value)
+        }
+    }
+    
     private func getValue(_ _code: String) throws -> SlowlyBasicTypeProtocol {
         let code = _code.trimmingCharacters(in: .whitespacesAndNewlines)
         switch code {
@@ -351,31 +381,11 @@ class SlowlyCodeProcessor {
         case SlowlyRegex.basicDouble.rawValue.r:
             return SlowlyDouble(value: Double(code) ?? 0.0)
         case SlowlyRegex.eNumbers.rawValue.r:
-            let eNumberInfo = SlowlyRegex.eNumbers.rawValue.r?.findFirst(in: code)
-            
-            guard let num = eNumberInfo?.group(at: 1) else {
-                throw SlowlyCompileError.cannotParseStatement(statement: code)
-            }
-            
-            guard let numIndex = eNumberInfo?.group(at: 2) else {
-                throw SlowlyCompileError.cannotParseStatement(statement: code)
-            }
-            
-            var value = Double(num) ?? 0
-            
-            for _ in 0..<(Int(numIndex) ?? 0) {
-                value *= 10
-            }
-            
-            if code.hasPrefix("-") {
-                // 负数
-                return SlowlyDouble(value: -value)
-            } else {
-                // 正数
-                return SlowlyDouble(value: value)
-            }
+            do { return try creatENumber(code) } catch { throw error }
         case SlowlyRegex.basicString.rawValue.r:
-            
+            guard self.verificationString(code) else {
+                throw SlowlyValueError.couldNotParseString(string: code)
+            }
         default:
             if let value = getValueValue(name: code) {
                 return value
