@@ -10,4 +10,6 @@ import Foundation
 public enum SlowlyValueError: Error {
     case unableToCreateVariable(name: String, value: String)
     case theVariableAlreadyExistsInTheCurrentContext(name: String)
+    case unableToFindTheValue(name: String)
+    case typeDoesNotMatchWhenAssigning(name: String)
 }

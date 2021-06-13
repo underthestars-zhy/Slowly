@@ -8,8 +8,8 @@
         }
         
         func testVariable2() {
-            let code2 = [["@main", "var test = 1", "test := 1"]]
-            XCTAssertThrowsError(try Slowly.shared.setCompileCode(code2).build().end())
+            let code = [["@main", "var test = 1", "test := 1"]]
+            XCTAssertThrowsError(try Slowly.shared.setCompileCode(code).build().end())
         }
         
         func testFunc() {
@@ -28,5 +28,20 @@
             } catch {
                 print(error)
             }
+        }
+        
+        func testUpdateValue() {
+            let code = [["@main", "a := 1", "print(a)", "a = 2", "print(a)"]]
+            
+            do {
+                try Slowly.shared.setCompileCode(code).build().end()
+            } catch {
+                print(error)
+            }
+        }
+        
+        func testUpdateValue2() {
+            let code = [["@main", "a := 1", "print(a)", "a = 2.1", "print(a)"]]
+            XCTAssertThrowsError(try Slowly.shared.setCompileCode(code).build().end())
         }
     }

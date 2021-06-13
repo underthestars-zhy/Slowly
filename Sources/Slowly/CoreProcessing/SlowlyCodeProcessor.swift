@@ -12,6 +12,7 @@ enum SlowlyRegex: String {
     case defineVariables = #"^var ([A-z|_]\S*) = (\S+)$"#
     case defineConstant = #"^let ([A-z|_]\S*) = (\S+)$"#
     case fastMeasurement = #"^([A-z|_]\S*) := (\S+)$"#
+    case assignment = #"^([A-z|_]\S*) = (\S+)$"#
     case basicNumbers = #"^-?\d+$"#
     case basicDouble = #"^-?\d+\.\d+$"#
     case eNumbers = #"^-?(\d+\.?\d*)e(\d+)$"#
@@ -48,6 +49,7 @@ class SlowlyCodeProcessor {
             case SlowlyRegex.defineVariables.rawValue.r: try self.defineVariables(code)
             case SlowlyRegex.defineConstant.rawValue.r: try self.defineConstant(code)
             case SlowlyRegex.fastMeasurement.rawValue.r: try self.fastMeasurement(code)
+            case SlowlyRegex.assignment.rawValue.r: try self.assignment(code)
             case SlowlyRegex.basicFunction.rawValue.r: let _ = try self.callFunction(code)
             default:
                 SlowlyInterpreterInfo.shared.continueToCompile = false
@@ -157,13 +159,55 @@ class SlowlyCodeProcessor {
     }
     
     // MARK: - Usage value
-    private func getValueValue(name: String) ->SlowlyBasicTypeProtocol? {
+    private func getValueValue(name: String) -> SlowlyBasicTypeProtocol? {
         for value in SlowlyInterpreterInfo.shared.value {
             if name == value.name {
                 return value.value
             }
         }
         return nil
+    }
+    
+    private func getValueIndex(name: String) -> Int {
+        for (index, value) in SlowlyInterpreterInfo.shared.value.enumerated() {
+            if name == value.name {
+                return index
+            }
+        }
+        return 0
+    }
+    
+    // MARK: - Update Value
+    private func updateValue(name: String, value: SlowlyBasicTypeProtocol) throws {
+        if value.basicType == getValueValue(name: name)?.basicType || value.basicType == .any {
+            SlowlyInterpreterInfo.shared.value[getValueIndex(name: name)].value = value
+        } else {
+            throw SlowlyValueError.typeDoesNotMatchWhenAssigning(name: name)
+        }
+    }
+    
+    // MARK: - Assignment
+    private func assignment(_ code: String) throws {
+        let assignmentInfo = SlowlyRegex.assignment.rawValue.r?.findFirst(in: code)
+        
+        guard let name = assignmentInfo?.group(at: 1) else  {
+            throw SlowlyCompileError.cannotParseStatement(statement: code)
+        }
+        
+        guard let expression = assignmentInfo?.group(at: 2) else {
+            throw SlowlyCompileError.cannotParseStatement(statement: code)
+        }
+        
+        guard variableHasBeenAdded(name: name) else {
+            throw SlowlyValueError.unableToFindTheValue(name: name)
+        }
+        
+        do {
+            let value = try getValue(expression)
+            try updateValue(name: name, value: value)
+        } catch {
+            throw error
+        }
     }
     
     // MARK: - Call functions
