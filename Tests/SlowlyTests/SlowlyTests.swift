@@ -3,7 +3,7 @@
 
     final class SlowlyTests: XCTestCase {
         func testVariable() {
-            let code = [["@main", "var test = 1", "var test2 = 1"]]
+            let code = [["@main", "var test = 1", "var test2 = 1", "let text3 = 1.33"]]
             XCTAssertNoThrow(try Slowly.shared.setCompileCode(code).build().end())
         }
         

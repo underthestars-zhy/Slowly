@@ -10,6 +10,7 @@ import Regex
 
 enum SlowlyRegex: String {
     case defineVariables = #"^var ([A-z|_]\S*) = (\S+)$"#
+    case defineConstant = #"^let ([A-z|_]\S*) = (\S+)$"#
     case basicNumbers = #"^-?\d+$"#
     case basicDouble = #"^-?\d+\.\d+$"#
     case eNumbers = #"^-?(\d+\.?\d*)e(\d+)$"#
@@ -44,6 +45,7 @@ class SlowlyCodeProcessor {
         do {
             switch code {
             case SlowlyRegex.defineVariables.rawValue.r: try self.defineVariables(code)
+            case SlowlyRegex.defineConstant.rawValue.r: try self.defineConstant(code)
             case SlowlyRegex.basicFunction.rawValue.r: let _ = try self.callFunction(code)
             default:
                 SlowlyInterpreterInfo.shared.continueToCompile = false
@@ -89,6 +91,38 @@ class SlowlyCodeProcessor {
         
         do {
             SlowlyInterpreterInfo.shared.value.append(.init(type: .variable, name: name, value: try getValue(value)))
+        } catch {
+            throw error
+        }
+    }
+    
+    // MARK: - Define constant
+    
+    private func defineConstant(_ code: String) throws {
+        let valueInfo = SlowlyRegex.defineConstant.rawValue.r?.findFirst(in: code)
+        
+        guard let name = valueInfo?.group(at: 1) else  {
+            throw SlowlyCompileError.cannotParseStatement(statement: code)
+        }
+        
+        guard let value = valueInfo?.group(at: 2) else {
+            throw SlowlyCompileError.cannotParseStatement(statement: code)
+        }
+        
+        do {
+            try creatConstant(name: name, value: value)
+        } catch {
+            throw error
+        }
+    }
+    
+    private func creatConstant(name: String, value: String) throws {
+        guard !variableHasBeenAdded(name: name) else {
+            throw SlowlyValueError.theVariableAlreadyExistsInTheCurrentContext(name: name)
+        }
+        
+        do {
+            SlowlyInterpreterInfo.shared.value.append(.init(type: .constant, name: name, value: try getValue(value)))
         } catch {
             throw error
         }
