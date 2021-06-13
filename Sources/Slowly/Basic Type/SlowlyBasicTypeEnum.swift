@@ -13,4 +13,5 @@ enum SlowlyBasicTypeEnum {
     case none
     case int
     case double
+    case string
 }

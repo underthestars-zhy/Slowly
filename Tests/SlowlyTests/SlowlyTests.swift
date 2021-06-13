@@ -44,4 +44,9 @@
             let code = [["@main", "a := 1", "print(a)", "a = 2.1", "print(a)"]]
             XCTAssertThrowsError(try Slowly.shared.setCompileCode(code).build().end())
         }
+        
+        func testUpdateValue3() {
+            let code = [["@main", "A := 2", "print(A)", "a = 3", "print(A)"]]
+            XCTAssertThrowsError(try Slowly.shared.setCompileCode(code).build().end())
+        }
     }

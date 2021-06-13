@@ -14,6 +14,7 @@ enum SlowlyRegex: String {
     case fastMeasurement = #"^([A-z|_]\S*) := (\S+)$"#
     case assignment = #"^([A-z|_]\S*) = (\S+)$"#
     case basicNumbers = #"^-?\d+$"#
+    case basicString = #""([\s\S]*)""#
     case basicDouble = #"^-?\d+\.\d+$"#
     case eNumbers = #"^-?(\d+\.?\d*)e(\d+)$"#
     case basicFunction = #"^([A-z|_]\S*)\((.*)\)$"#
@@ -373,6 +374,8 @@ class SlowlyCodeProcessor {
                 // 正数
                 return SlowlyDouble(value: value)
             }
+        case SlowlyRegex.basicString.rawValue.r:
+            
         default:
             if let value = getValueValue(name: code) {
                 return value
