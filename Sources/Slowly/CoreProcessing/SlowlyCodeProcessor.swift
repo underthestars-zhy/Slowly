@@ -11,6 +11,7 @@ import Regex
 enum SlowlyRegex: String {
     case defineVariables = #"^var ([A-z|_]\S*) = (\S+)$"#
     case defineConstant = #"^let ([A-z|_]\S*) = (\S+)$"#
+    case fastMeasurement = #"^([A-z|_]\S*) := (\S+)$"#
     case basicNumbers = #"^-?\d+$"#
     case basicDouble = #"^-?\d+\.\d+$"#
     case eNumbers = #"^-?(\d+\.?\d*)e(\d+)$"#
@@ -46,6 +47,7 @@ class SlowlyCodeProcessor {
             switch code {
             case SlowlyRegex.defineVariables.rawValue.r: try self.defineVariables(code)
             case SlowlyRegex.defineConstant.rawValue.r: try self.defineConstant(code)
+            case SlowlyRegex.fastMeasurement.rawValue.r: try self.fastMeasurement(code)
             case SlowlyRegex.basicFunction.rawValue.r: let _ = try self.callFunction(code)
             default:
                 SlowlyInterpreterInfo.shared.continueToCompile = false
@@ -123,6 +125,32 @@ class SlowlyCodeProcessor {
         
         do {
             SlowlyInterpreterInfo.shared.value.append(.init(type: .constant, name: name, value: try getValue(value)))
+        } catch {
+            throw error
+        }
+    }
+    
+    // MARK: - Fast measurement
+    
+    private func fastMeasurement(_ code: String) throws {
+        let valueInfo = SlowlyRegex.fastMeasurement.rawValue.r?.findFirst(in: code)
+        
+        guard let name = valueInfo?.group(at: 1) else  {
+            throw SlowlyCompileError.cannotParseStatement(statement: code)
+        }
+        
+        guard let value = valueInfo?.group(at: 2) else {
+            throw SlowlyCompileError.cannotParseStatement(statement: code)
+        }
+        
+        do {
+            if name.uppercased() == name {
+                // 说明快速定义常量
+                try self.creatConstant(name: name, value: value)
+            } else {
+                // 说明快速定义变量
+                try self.creatVariable(name: name, value: value)
+            }
         } catch {
             throw error
         }

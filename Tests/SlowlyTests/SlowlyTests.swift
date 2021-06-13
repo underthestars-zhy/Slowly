@@ -3,12 +3,12 @@
 
     final class SlowlyTests: XCTestCase {
         func testVariable() {
-            let code = [["@main", "var test = 1", "var test2 = 1", "let text3 = 1.33"]]
+            let code = [["@main", "var test = 1", "var test2 = 1", "let text3 = 1.33", "test4 := 11"]]
             XCTAssertNoThrow(try Slowly.shared.setCompileCode(code).build().end())
         }
         
         func testVariable2() {
-            let code2 = [["@main", "var test = 1", "var test = 1"]]
+            let code2 = [["@main", "var test = 1", "test := 1"]]
             XCTAssertThrowsError(try Slowly.shared.setCompileCode(code2).build().end())
         }
         
@@ -22,7 +22,7 @@
         }
         
         func testFunc2() {
-            let code = [["@main", "var items = 11222", "print(items)", "print(items: items)", "var aa = 1.22e4", "print(aa)"]]
+            let code = [["@main", "var items = 11222", "print(items)", "print(items: items)", "var aa = 1.22e4", "print(aa)", "let bb = 145", "print(bb)", "cc := 1.45", "print(cc)"]]
             do {
                 try Slowly.shared.setCompileCode(code).build().end()
             } catch {
