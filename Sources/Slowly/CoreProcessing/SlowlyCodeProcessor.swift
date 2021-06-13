@@ -343,8 +343,16 @@ class SlowlyCodeProcessor {
         return false
     }
     
-    private func verificationString(_ str: String) -> Bool {
+    private func creatBasicString(_ str: String) throws -> SlowlyString {
+        guard let newString = SlowlyRegex.basicString.rawValue.r?.findFirst(in: str)?.group(at: 1) else {
+            throw SlowlyValueError.couldNotParseString(string: str)
+        }
         
+        guard newString.firstIndex(of: #"""#) == nil else {
+            throw SlowlyValueError.couldNotParseString(string: str)
+        }
+        
+        return SlowlyString(value: newString)
     }
     
     private func creatENumber(_ code: String) throws -> SlowlyDouble {
@@ -383,9 +391,7 @@ class SlowlyCodeProcessor {
         case SlowlyRegex.eNumbers.rawValue.r:
             do { return try creatENumber(code) } catch { throw error }
         case SlowlyRegex.basicString.rawValue.r:
-            guard self.verificationString(code) else {
-                throw SlowlyValueError.couldNotParseString(string: code)
-            }
+            do { return try self.creatBasicString(code) } catch { throw error }
         default:
             if let value = getValueValue(name: code) {
                 return value

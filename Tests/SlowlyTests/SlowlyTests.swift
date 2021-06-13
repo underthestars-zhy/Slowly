@@ -49,4 +49,19 @@
             let code = [["@main", "A := 2", "print(A)", "a = 3", "print(A)"]]
             XCTAssertThrowsError(try Slowly.shared.setCompileCode(code).build().end())
         }
+        
+        func testString() {
+            let code = [["@main", #"a := "hi""#, "print(a)", #"a = "hello""#, "print(a)"]]
+            
+            do {
+                try Slowly.shared.setCompileCode(code).build().end()
+            } catch {
+                print(error)
+            }
+        }
+        
+        func testString2() {
+            let code = [["@main", #"a := ""hi"""#, "print(a)"]]
+            XCTAssertThrowsError(try Slowly.shared.setCompileCode(code).build().end())
+        }
     }
