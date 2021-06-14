@@ -31,6 +31,7 @@ class SlowlyCodeProcessor {
         // Remove spaces and newlines
         let code = constructionNotes( _code.trimmingCharacters(in: .whitespacesAndNewlines))
         
+        // 是否为空行
         guard code != "" else {
             SlowlyInterpreterInfo.shared.codePointer += 1
             return
