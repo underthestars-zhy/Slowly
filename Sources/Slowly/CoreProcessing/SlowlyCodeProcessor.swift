@@ -29,7 +29,12 @@ class SlowlyCodeProcessor {
     
     func process(with _code: String) throws {
         // Remove spaces and newlines
-        let code = _code.trimmingCharacters(in: .whitespacesAndNewlines)
+        let code = constructionNotes( _code.trimmingCharacters(in: .whitespacesAndNewlines))
+        
+        guard code != "" else {
+            SlowlyInterpreterInfo.shared.codePointer += 1
+            return
+        }
         
         // 检测开始开始
         if findMain {
@@ -398,6 +403,10 @@ class SlowlyCodeProcessor {
             }
             throw SlowlyCompileError.cannotParseStatement(statement: code)
         }
+    }
+    
+    private func constructionNotes(_ code: String) -> String {
+        return String(code.split(with: "/").first ?? "")
     }
 }
 

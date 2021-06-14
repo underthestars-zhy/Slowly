@@ -64,4 +64,14 @@
             let code = [["@main", #"a := ""hi"""#, "print(a)"]]
             XCTAssertThrowsError(try Slowly.shared.setCompileCode(code).build().end())
         }
+        
+        func testNote() {
+            let code = [["@main", #"a := "note // note" // sss"#, "print(a)", "// ddddd"]]
+            
+            do {
+                try Slowly.shared.setCompileCode(code).build().end()
+            } catch {
+                print(error)
+            }
+        }
     }
