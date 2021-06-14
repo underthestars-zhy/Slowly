@@ -18,7 +18,7 @@ do {
     // do something...
 }
 ```
-`code`Is a`[[String]]`.
+`code` is a `[[String]]`.
 
 ## Expand
 
