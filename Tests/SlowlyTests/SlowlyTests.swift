@@ -76,7 +76,7 @@
         }
         
         func testDouble() {
-            let code = [["@main", #"a := 1.1"#, "print(a)", "print(1.0)"]]
+            let code = [["@main", #"a := -1.1"#, "print(a)", "print(-1.0)", "print(1.2e3)", "print(-1.2e2)"]]
             
             do {
                 try Slowly.shared.setCompileCode(code).build().end()

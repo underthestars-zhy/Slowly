@@ -16,7 +16,7 @@ enum SlowlyRegex: String {
     case basicNumbers = #"^-?\d+$"#
     case basicString = #"^"(.*)"$"#
     case basicDouble = #"^-?\d+\.\d+$"#
-    case eNumbers = #"^-?(\d+\.?\d*)e(\d+)$"#
+    case eNumbers = #"^(-?\d+\.?\d*)e(\d+)$"#
     case basicFunction = #"^([A-z|_]\S*)\((.*)\)$"#
 }
 
@@ -364,27 +364,15 @@ class SlowlyCodeProcessor {
     private func creatENumber(_ code: String) throws -> SlowlyDouble {
         let eNumberInfo = SlowlyRegex.eNumbers.rawValue.r?.findFirst(in: code)
         
-        guard let num = eNumberInfo?.group(at: 1) else {
+        guard let num = Double(eNumberInfo?.group(at: 1) ?? "") else {
             throw SlowlyCompileError.cannotParseStatement(statement: code)
         }
         
-        guard let numIndex = eNumberInfo?.group(at: 2) else {
+        guard let numIndex = Int(eNumberInfo?.group(at: 2) ?? "") else {
             throw SlowlyCompileError.cannotParseStatement(statement: code)
         }
         
-        var value = Double(num) ?? 0
-        
-        for _ in 0..<(Int(numIndex) ?? 0) {
-            value *= 10
-        }
-        
-        if code.hasPrefix("-") {
-            // 负数
-            return SlowlyDouble(value: -value)
-        } else {
-            // 正数
-            return SlowlyDouble(value: value)
-        }
+        return SlowlyDouble(num: num, power: numIndex)
     }
     
     private func getValue(_ _code: String) throws -> SlowlyBasicTypeProtocol {

@@ -15,12 +15,17 @@ struct SlowlyDouble: SlowlyBasicTypeProtocol, Printable {
     static var initParameters: [SlowlyFunctionInfo] = [
         SlowlyFunctionInfo(id: 1, parameter: [
             SlowlyFunctionParameter(name: "source", ignoreName: true, identifier: "source", type: .double)
+        ], returnValue: .none),
+        SlowlyFunctionInfo(id: 2, parameter: [
+            SlowlyFunctionParameter(name: "num", ignoreName: true, identifier: "num", type: .double),
+            SlowlyFunctionParameter(name: "power", ignoreName: true, identifier: "power", type: .int)
         ], returnValue: .none)
     ]
     
     static func callFunctions(id: Int, values: [String : Any]) -> SlowlyBasicTypeProtocol? {
         switch id {
         case 1: return SlowlyDouble(value: values["source"] as! Double)
+        case 2: return SlowlyDouble(num: values["num"] as! Double, power: values["power"] as! Int)
         default: return nil
         }
     }
@@ -39,6 +44,16 @@ struct SlowlyDouble: SlowlyBasicTypeProtocol, Printable {
             self.value = (molecular: Int(string[0] + string[1]) ?? 0, denominator: Int(pow(10, Float(string[1].count))))
         } else {
             self.value = (molecular: Int(value), denominator: 1)
+        }
+    }
+    
+    init(num: Double, power: Int) {
+        self.isNilInt = false
+        let string = String(num).split(separator: ".")
+        if string.count == 2 {
+            self.value = (molecular: (Int(string[0] + string[1]) ?? 0) * Int(pow(10, Float(power))), denominator: Int(pow(10, Float(string[1].count))))
+        } else {
+            self.value = (molecular: Int(num) * Int(pow(10, Float(power))), denominator: 1)
         }
     }
     
