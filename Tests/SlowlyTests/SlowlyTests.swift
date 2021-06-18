@@ -31,7 +31,7 @@
         }
         
         func testUpdateValue() {
-            let code = [["@main", "a := 1", "print(a)", "a = 2", "print(a)"]]
+            let code = [["@main", "a := 1.1", "print(a)", "a = 2.2", "print(a)"]]
             
             do {
                 try Slowly.shared.setCompileCode(code).build().end()
@@ -67,6 +67,16 @@
         
         func testNote() {
             let code = [["@main", #"a := "note // note" // sss"#, "print(a)", "// ddddd"]]
+            
+            do {
+                try Slowly.shared.setCompileCode(code).build().end()
+            } catch {
+                print(error)
+            }
+        }
+        
+        func testDouble() {
+            let code = [["@main", #"a := 1.1"#, "print(a)", "print(1.0)"]]
             
             do {
                 try Slowly.shared.setCompileCode(code).build().end()

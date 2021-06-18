@@ -28,25 +28,30 @@ struct SlowlyDouble: SlowlyBasicTypeProtocol, Printable {
     let basicType: SlowlyBasicTypeEnum = .double
     
     // MARK: - SlowlyInt
-    var value: Double?
+    var value: (molecular: Int, denominator: Int)?
     var isNilInt: Bool
     
     // MARK: - Init
     init(value: Double) {
         self.isNilInt = false
-        self.value = value
+        let string = String(value).split(separator: ".")
+        if string.count == 2 {
+            self.value = (molecular: Int(string[0] + string[1]) ?? 0, denominator: Int(pow(10, Float(string[1].count))))
+        } else {
+            self.value = (molecular: Int(value), denominator: 1)
+        }
     }
     
     // MARK: - Print
     func printString() -> String {
         if isNilInt {
             if let value = self.value {
-                return "Optional(\(value))"
+                return "Optional(\(value.molecular)/\(value.denominator)"
             } else {
                 return "Optional(nil)"
             }
         } else {
-            return String(value!)
+            return "\(value?.molecular ?? 0)/\(value?.denominator ?? 0)"
         }
     }
 }
