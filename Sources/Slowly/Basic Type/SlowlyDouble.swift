@@ -35,9 +35,10 @@ struct SlowlyDouble: SlowlyBasicTypeProtocol, Printable {
     // MARK: - SlowlyInt
     var value: (molecular: Int, denominator: Int)?
     var isNilInt: Bool
+    var isLock = false
     
     // MARK: - Init
-    init(value: Double) {
+    init(value: Double)  {
         self.isNilInt = false
         let string = String(value).split(separator: ".")
         if string.count == 2 {
@@ -45,6 +46,8 @@ struct SlowlyDouble: SlowlyBasicTypeProtocol, Printable {
         } else {
             self.value = (molecular: Int(value), denominator: 1)
         }
+        
+        reduce()
     }
     
     init(num: Double, power: Int) {
@@ -55,6 +58,39 @@ struct SlowlyDouble: SlowlyBasicTypeProtocol, Printable {
         } else {
             self.value = (molecular: Int(num) * Int(pow(10, Float(power))), denominator: 1)
         }
+        
+        reduce()
+    }
+    
+    mutating func reduce() {
+        guard var molecular = value?.molecular else { return }
+        guard var denominator = value?.denominator else { return }
+        
+        let isOdd = (molecular < 0)
+        molecular = isOdd ? -molecular : molecular
+        
+        if molecular % denominator == 0 {
+            value?.molecular = isOdd ? -(molecular / denominator) : molecular / denominator
+            value?.denominator = 1
+            return
+        }
+        
+        if denominator % molecular == 0 {
+            value?.denominator = isOdd ? -(molecular / denominator) : molecular / denominator
+            value?.molecular = 1
+            return
+        }
+        
+        if ExpandMath.isPrime(molecular) || ExpandMath.isPrime(denominator) { return }
+        
+        for i in 2..<molecular {
+            if molecular % i == 0 && denominator % i == 0 {
+                molecular = molecular / i
+                denominator = denominator / i
+            }
+        }
+        value?.molecular = isOdd ? -molecular : molecular
+        value?.denominator = denominator
     }
     
     // MARK: - Print
