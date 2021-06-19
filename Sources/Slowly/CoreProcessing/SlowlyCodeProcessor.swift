@@ -354,7 +354,7 @@ class SlowlyCodeProcessor {
             throw SlowlyValueError.couldNotParseString(string: str)
         }
         
-        guard newString.firstIndex(of: #"""#) == nil else {
+        guard newString.firstIndex(of: "\"") == nil else {
             throw SlowlyValueError.couldNotParseString(string: str)
         }
         
